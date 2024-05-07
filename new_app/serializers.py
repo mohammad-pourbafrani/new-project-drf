@@ -13,9 +13,22 @@ class UserSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+def check_title(attrs):
+    if attrs["title"] == attrs["body"]:
+        raise serializers.ValidationError({"titel": "the value of title not shoude smaller 3 charachter"})
+        # self.fail("titel_error")
+    return attrs
+
+
+class CheckTitle:
+    def __call__(self, data):
+        if len(data["title"]) < 3:
+            raise serializers.ValidationError({"titel": "the value of title not shoude smaller 3 charachter"})
+
+
 # class ArticleSerializer(serializers.Serializer):
 #     id = serializers.IntegerField(required=False)
-#     title = serializers.CharField(max_length=50)
+#     title = serializers.CharField(max_length=50, validators=[check_title])
 #     body = serializers.CharField()
 #     status = serializers.BooleanField()
 
@@ -30,3 +43,10 @@ class ArticleSerializer(serializers.ModelSerializer):
         model = Article
         fields = ("id", "title", "body", "status")
         read_only_fields = ["id"]
+        validators = [CheckTitle()]
+
+
+# def validate_title(self, value):
+#     if len(value) < 3:
+#         raise serializers.ValidationError("the value of title not shoude smaller 3 charachter")
+#     return value
